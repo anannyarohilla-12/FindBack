@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Report | FindBack</title>
+</head>
+
+<body style="font-family:Arial;padding:40px;">
+
+    <h2>Delete "{{ report.title }}"?</h2>
+
+    <p>Are you sure you want to delete this report?</p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <button type="submit">Yes, Delete</button>
+    </form>
+
+    <p>
+        <a href="{% url 'my_reports' %}">Cancel</a>
+    </p>
+
+</body>
+
+</html>

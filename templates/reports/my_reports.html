@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Reports | FindBack</title>
+</head>
+
+<body style="font-family:Arial;background:#f1f5f9;padding:30px;">
+
+    <h1>My Reports</h1>
+
+    <p>
+        <a href="{% url 'report_lost' %}">Report Lost</a> |
+        <a href="{% url 'report_found' %}">Report Found</a> |
+        <a href="{% url 'browse_items' %}">Browse Items</a>
+    </p>
+
+    {% for item in reports %}
+
+    <div style="background:white;padding:20px;margin-bottom:15px;border-radius:10px;">
+
+        {% if item.image %}
+        <img src="{{ item.image.url }}" alt="Item photo" width="150">
+        {% endif %}
+
+        <h3>{{ item.title }}</h3>
+
+        <p>Type: {{ item.get_report_type_display }}</p>
+        <p>Status: {{ item.get_status_display }}</p>
+        <p>Location: {{ item.location }}</p>
+
+        <a href="{% url 'edit_report' item.pk %}">Edit</a>
+
+        <a href="{% url 'delete_report' item.pk %}">Delete</a>
+
+    </div>
+
+    {% empty %}
+
+    <p>You have not submitted any reports yet.</p>
+
+    {% endfor %}
+
+</body>
+
+</html>

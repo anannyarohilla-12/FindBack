@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FindBack | Lost & Found</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        nav {
+            background: #172554;
+            color: white;
+            padding: 20px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav h2 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .logout-button {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 14px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .hero {
+            padding: 90px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        }
+
+        .hero h1 {
+            max-width: 950px;
+            margin: 0 auto 20px;
+            font-size: clamp(32px, 5vw, 54px);
+            line-height: 1.2;
+            color: #172033;
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #475569;
+            margin: 10px auto;
+            max-width: 750px;
+        }
+
+        .buttons {
+            margin-top: 32px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 23px;
+            border-radius: 9px;
+            text-decoration: none;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .btn.secondary {
+            background: #172554;
+        }
+
+        .btn.secondary:hover {
+            background: #243b73;
+        }
+
+        .btn.green {
+            background: #15803d;
+        }
+
+        .btn.green:hover {
+            background: #166534;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,
+                    minmax(230px, 1fr));
+            gap: 24px;
+            padding: 55px 7%;
+        }
+
+        .card {
+            background: white;
+            padding: 28px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px #0000000a;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px #00000012;
+        }
+
+        .card h3 {
+            font-size: 22px;
+            color: #172554;
+            margin-top: 0;
+        }
+
+        .card p {
+            color: #475569;
+            line-height: 1.7;
+        }
+
+        .how-it-works {
+            background: white;
+            padding: 50px 7%;
+            text-align: center;
+        }
+
+        .how-it-works h2 {
+            color: #172554;
+            font-size: 30px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,
+                    minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 35px;
+        }
+
+        .step {
+            padding: 20px;
+            background: #f4f7fb;
+            border-radius: 12px;
+        }
+
+        .step-number {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        footer {
+            background: #172554;
+            color: white;
+            text-align: center;
+            padding: 28px 15px;
+            line-height: 1.8;
+        }
+
+        footer p {
+            margin: 5px;
+        }
+
+        @media (max-width: 650px) {
+            nav {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .nav-links {
+                gap: 13px;
+            }
+
+            .hero {
+                padding: 60px 18px;
+            }
+
+            .features {
+                padding: 30px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION BAR -->
+
+    <nav>
+        <h2>🔎 FindBack</h2>
+
+        <div class="nav-links">
+
+            <a href="{% url 'home' %}">Home</a>
+
+            <a href="{% url 'browse_items' %}">Browse Items</a>
+
+            {% if user.is_authenticated %}
+
+            <a href="{% url 'report_lost' %}">Report Lost</a>
+
+            <a href="{% url 'report_found' %}">Report Found</a>
+
+            <a href="{% url 'my_reports' %}">My Reports</a>
+
+            <a href="{% url 'my_matches' %}">Smart Matches</a>
+
+            <span>Hi, {{ user.username }}</span>
+
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+
+                <button class="logout-button" type="submit">
+                    Logout
+                </button>
+            </form>
+
+            {% else %}
+
+            <a href="{% url 'login' %}">Login</a>
+
+            <a href="{% url 'register' %}">Register</a>
+
+            {% endif %}
+
+        </div>
+    </nav>
+
+
+    <!-- HERO SECTION -->
+
+    <section class="hero">
+
+        <h1>Lost Something? Find It Back.</h1>
+
+        <p>
+            A smarter way to reconnect lost belongings with their owners.
+        </p>
+
+        <p>
+            Report lost items, upload photos and discover potential matches.
+        </p>
+
+        <div class="buttons">
+
+            {% if user.is_authenticated %}
+
+            <a class="btn" href="{% url 'report_lost' %}">
+                📢 Report Lost Item
+            </a>
+
+            <a class="btn secondary" href="{% url 'report_found' %}">
+                🎒 Report Found Item
+            </a>
+
+            <a class="btn green" href="{% url 'my_matches' %}">
+                🎯 Smart Matches
+            </a>
+
+            {% else %}
+
+            <a class="btn" href="{% url 'register' %}">
+                Get Started
+            </a>
+
+            <a class="btn secondary" href="{% url 'login' %}">
+                Login
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <!-- FEATURES -->
+
+    <section class="features">
+
+        <div class="card">
+            <h3>📸 Photo Upload</h3>
+
+            <p>
+                Upload photographs of lost or found belongings
+                along with descriptions, colours and locations.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>🎯 Smart Matching</h3>
+
+            <p>
+                Compare item details and discover potentially
+                matching lost and found reports.
+            </p>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'my_matches' %}">Explore Matches →</a>
+            {% else %}
+            <a href="{% url 'login' %}">Login to Explore →</a>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>🔍 Easy Search</h3>
+
+            <p>
+                Search reports by item name, category,
+                description and location.
+            </p>
+
+            <a href="{% url 'browse_items' %}">Browse Items →</a>
+        </div>
+
+        <div class="card">
+            <h3>📊 Data Insights</h3>
+
+            <p>
+                Analyse lost and found trends with statistics
+                and visualisations as the project develops.
+            </p>
+        </div>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+
+    <section class="how-it-works">
+
+        <h2>How FindBack Works</h2>
+
+        <p>Three simple steps to help reunite people with their belongings.</p>
+
+        <div class="steps">
+
+            <div class="step">
+                <span class="step-number">1</span>
+
+                <h3>Report an Item</h3>
+
+                <p>
+                    Submit a Lost or Found report with a photo
+                    and item details.
+                </p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+
+                <h3>Discover Matches</h3>
+
+                <p>
+                    Review potential matches based on similar
+                    item descriptions and details.
+                </p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+
+                <h3>Reconnect</h3>
+
+                <p>
+                    Verify the item details and coordinate
+                    its safe return.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <h3>🔎 FindBack</h3>
+
+        <p>Lost &amp; Found Smart Matching System</p>
+
+        <p>Helping lost belongings find their way home.</p>
+
+        <p>Developed using Python, Django and SQLite.</p>
+
+    </footer>
+
+</body>
+
+</html>

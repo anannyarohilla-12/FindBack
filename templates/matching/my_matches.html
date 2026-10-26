@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Matches | FindBack</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #172033;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 20px 6%;
+        }
+
+        header a {
+            color: white;
+            margin-right: 18px;
+        }
+
+        main {
+            padding: 30px 6%;
+        }
+
+        .match-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px #0000000c;
+        }
+
+        .score {
+            color: #166534;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .items img {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .reasons {
+            color: #475569;
+            line-height: 1.8;
+        }
+
+        .empty {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🎯 FindBack Smart Matches</h1>
+
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'browse_items' %}">Browse Items</a>
+        <a href="{% url 'my_reports' %}">My Reports</a>
+    </header>
+
+    <main>
+
+        <h2>Potential Matches for Your Lost Items</h2>
+
+        <p>
+            These suggestions are based on item details.
+            Always verify an item before claiming it.
+        </p>
+
+        {% for match in matches %}
+
+        <section class="match-card">
+
+            <div class="score">
+                {{ match.score }}% Match
+            </div>
+
+            <div class="items">
+
+                <div>
+                    <h3>Lost: {{ match.lost_item.title }}</h3>
+
+                    {% if match.lost_item.image %}
+                    <img src="{{ match.lost_item.image.url }}" alt="Lost item">
+                    {% endif %}
+
+                    <p>Category: {{ match.lost_item.category }}</p>
+                    <p>Colour: {{ match.lost_item.color }}</p>
+                    <p>Location: {{ match.lost_item.location }}</p>
+                </div>
+
+                <div>
+                    <h3>Found: {{ match.found_item.title }}</h3>
+
+                    {% if match.found_item.image %}
+                    <img src="{{ match.found_item.image.url }}" alt="Found item">
+                    {% endif %}
+
+                    <p>Category: {{ match.found_item.category }}</p>
+                    <p>Colour: {{ match.found_item.color }}</p>
+                    <p>Location: {{ match.found_item.location }}</p>
+                </div>
+
+            </div>
+
+            <h4>Why this match?</h4>
+
+            <ul class="reasons">
+                {% for reason in match.reasons %}
+                <li>{{ reason }}</li>
+                {% empty %}
+                <li>Some details are similar.</li>
+                {% endfor %}
+            </ul>
+
+        </section>
+
+        {% empty %}
+
+        <div class="empty">
+            <h3>No potential matches yet</h3>
+
+            <p>
+                Matches appear when another user's Found report
+                has sufficiently similar details to your Lost report.
+            </p>
+
+            <a href="{% url 'browse_items' %}">Browse Items</a>
+        </div>
+
+        {% endfor %}
+
+    </main>
+
+</body>
+
+</html>

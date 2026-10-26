@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FindBack | Data Analytics Dashboard</title>
+
+    <!-- Plotly Charts -->
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #192b59;
+        }
+
+        .navbar {
+            background: #ffffff;
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: auto;
+            padding: 55px 5%;
+        }
+
+        .page-heading {
+            font-size: 38px;
+            margin-bottom: 25px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 18px;
+            margin-bottom: 45px;
+            line-height: 1.6;
+        }
+
+        /* Statistics Cards */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
+            border-top: 5px solid #2563eb;
+            min-width: 0;
+        }
+
+        .stat-card.red {
+            border-top-color: #ef4444;
+        }
+
+        .stat-card.green {
+            border-top-color: #16a34a;
+        }
+
+        .stat-card.purple {
+            border-top-color: #9333ea;
+        }
+
+        .stat-card.orange {
+            border-top-color: #ea580c;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .stat-number {
+            font-size: 38px;
+            font-weight: bold;
+            margin-top: 15px;
+            overflow-wrap: anywhere;
+        }
+
+        /* Section */
+
+        .section-title {
+            font-size: 29px;
+            margin-bottom: 25px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 28px;
+            margin-bottom: 45px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 28px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
+            min-width: 0;
+        }
+
+        .chart-card h3 {
+            font-size: 23px;
+            margin-bottom: 15px;
+        }
+
+        .chart-description {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .chart {
+            width: 100%;
+            min-height: 330px;
+        }
+
+        /* Recent Reports */
+
+        .table-card {
+            background: white;
+            padding: 28px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
+            margin-bottom: 40px;
+        }
+
+        .table-description {
+            color: #64748b;
+            margin: 12px 0 25px;
+            line-height: 1.6;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-lost {
+            color: #b91c1c;
+            background: #fee2e2;
+        }
+
+        .badge-found {
+            color: #15803d;
+            background: #dcfce7;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+            background: white;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 850px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-heading {
+                font-size: 30px;
+            }
+
+            .container {
+                padding-top: 35px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-number {
+                font-size: 30px;
+            }
+
+            .navbar {
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">FindBack</div>
+
+        <div class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'browse_items' %}">Browse Items</a>
+            <a href="{% url 'my_matches' %}">Smart Matches</a>
+            <a href="{% url 'analytics_dashboard' %}">Analytics</a>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <!-- Heading -->
+        <h1 class="page-heading">Data Insights Dashboard</h1>
+
+        <p class="subtitle">
+            Understand lost-and-found activity through interactive
+            graphs, statistics and data analysis.
+        </p>
+
+        <!-- Statistics Cards -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <p class="stat-label">📋 Total Active Reports</p>
+                <div class="stat-number">{{ total_reports }}</div>
+            </div>
+
+            <div class="stat-card red">
+                <p class="stat-label">🔴 Lost Items</p>
+                <div class="stat-number">{{ total_lost }}</div>
+            </div>
+
+            <div class="stat-card green">
+                <p class="stat-label">🟢 Found Items</p>
+                <div class="stat-number">{{ total_found }}</div>
+            </div>
+
+            <div class="stat-card purple">
+                <p class="stat-label">📈 Found Reports Share</p>
+                <div class="stat-number">{{ found_percentage }}%</div>
+            </div>
+
+            <div class="stat-card orange">
+                <p class="stat-label">📁 Average Reports per Category</p>
+                <div class="stat-number">{{ average_category_count }}</div>
+            </div>
+
+        </section>
+
+        <!-- Graphs -->
+        <section>
+            <h2 class="section-title">Visual Data Analysis</h2>
+
+            <div class="charts-grid">
+
+                <!-- Lost vs Found -->
+                <div class="chart-card">
+                    <h3>Lost vs Found Items</h3>
+
+                    <p class="chart-description">
+                        Compare the number of lost and found reports.
+                        Hover over the graph for details.
+                    </p>
+
+                    <div id="lostFoundChart" class="chart"></div>
+                </div>
+
+                <!-- Category Distribution -->
+                <div class="chart-card">
+                    <h3>Category Distribution</h3>
+
+                    <p class="chart-description">
+                        Explore the proportion of reports in each category.
+                    </p>
+
+                    <div id="categoryChart" class="chart"></div>
+                </div>
+
+                <!-- Monthly Reports -->
+                <div class="chart-card">
+                    <h3>Monthly Reports Analysis</h3>
+
+                    <p class="chart-description">
+                        Track lost and found reports by month.
+                    </p>
+
+                    <div id="monthlyChart" class="chart"></div>
+                </div>
+
+                <!-- Summary -->
+                <div class="chart-card">
+                    <h3>Report Summary</h3>
+
+                    <p class="chart-description">
+                        Compare the overall number of lost and found items.
+                    </p>
+
+                    <div id="summaryChart" class="chart"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Recent Reports Table -->
+        <section class="table-card">
+
+            <h2 class="section-title">Recent Reports</h2>
+
+            <p class="table-description">
+                The latest five reports submitted to FindBack.
+            </p>
+
+            <div class="table-wrapper">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Title</th>
+                            <th>Report Type</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                            <th>Event Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in recent_reports %}
+                        <tr>
+                            <td>{{ item.title }}</td>
+
+                            <td>
+                                {% if item.report_type == "LOST" %}
+                                    <span class="badge badge-lost">LOST</span>
+                                {% elif item.report_type == "FOUND" %}
+                                    <span class="badge badge-found">FOUND</span>
+                                {% else %}
+                                    {{ item.report_type }}
+                                {% endif %}
+                            </td>
+
+                            <td>{{ item.category|default:"Uncategorized" }}</td>
+
+                            <td>{{ item.location|default:"Not specified" }}</td>
+
+                            <td>
+                                {{ item.event_date|date:"d M Y"|default:"—" }}
+                            </td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-message">
+                                No reports available yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 FindBack | Lost & Found Smart Matching System</p>
+    </footer>
+
+    <!-- Graph Data -->
+    <script>
+        const totalLost = Number("{{ total_lost|default:0 }}");
+        const totalFound = Number("{{ total_found|default:0 }}");
+
+        const categoryLabels = {{ category_labels_json|safe }};
+        const categoryValues = {{ category_values_json|safe }};
+
+        const monthlyLabels = {{ monthly_labels_json|safe }};
+        const monthlyLost = {{ monthly_lost_json|safe }};
+        const monthlyFound = {{ monthly_found_json|safe }};
+
+        const commonLayout = {
+            autosize: true,
+            paper_bgcolor: "white",
+            plot_bgcolor: "white",
+            font: {
+                family: "Arial, sans-serif",
+                color: "#334155"
+            },
+            margin: {
+                t: 25,
+                r: 20,
+                b: 65,
+                l: 45
+            },
+            legend: {
+                orientation: "h",
+                y: -0.2
+            }
+        };
+
+        const config = {
+            responsive: true,
+            displayModeBar: false
+        };
+
+        // 1. Lost vs Found Bar Chart
+        Plotly.newPlot(
+            "lostFoundChart",
+            [
+                {
+                    x: ["Lost Items", "Found Items"],
+                    y: [totalLost, totalFound],
+                    type: "bar",
+                    marker: {
+                        color: ["#ef4444", "#16a34a"]
+                    },
+                    text: [totalLost, totalFound],
+                    textposition: "auto",
+                    hovertemplate: "%{x}: %{y}<extra></extra>"
+                }
+            ],
+            {
+                ...commonLayout,
+                yaxis: {
+                    title: "Number of Reports",
+                    rangemode: "tozero",
+                    dtick: 1
+                },
+                xaxis: {
+                    title: "Report Type"
+                }
+            },
+            config
+        );
+
+        // 2. Category Distribution Doughnut Chart
+        if (categoryLabels.length > 0) {
+
+            Plotly.newPlot(
+                "categoryChart",
+                [
+                    {
+                        labels: categoryLabels,
+                        values: categoryValues,
+                        type: "pie",
+                        hole: 0.55,
+                        textinfo: "label+percent",
+                        hovertemplate:
+                            "%{label}<br>Reports: %{value}<br>Share: %{percent}<extra></extra>"
+                    }
+                ],
+                {
+                    ...commonLayout,
+                    showlegend: true
+                },
+                config
+            );
+
+        } else {
+
+            document.getElementById("categoryChart").innerHTML =
+                "<p class='empty-message'>No category data available.</p>";
+        }
+
+        // 3. Monthly Reports Line Chart
+        if (monthlyLabels.length > 0) {
+
+            Plotly.newPlot(
+                "monthlyChart",
+                [
+                    {
+                        x: monthlyLabels,
+                        y: monthlyLost,
+                        name: "Lost Items",
+                        type: "scatter",
+                        mode: "lines+markers",
+                        line: {
+                            color: "#ef4444",
+                            width: 3
+                        }
+                    },
+                    {
+                        x: monthlyLabels,
+                        y: monthlyFound,
+                        name: "Found Items",
+                        type: "scatter",
+                        mode: "lines+markers",
+                        line: {
+                            color: "#16a34a",
+                            width: 3
+                        }
+                    }
+                ],
+                {
+                    ...commonLayout,
+                    xaxis: {
+                        title: "Month"
+                    },
+                    yaxis: {
+                        title: "Number of Reports",
+                        rangemode: "tozero",
+                        dtick: 1
+                    }
+                },
+                config
+            );
+
+        } else {
+
+            document.getElementById("monthlyChart").innerHTML =
+                "<p class='empty-message'>Monthly report data will appear when reports have valid event dates.</p>";
+        }
+
+        // 4. Report Summary Pie Chart
+        Plotly.newPlot(
+            "summaryChart",
+            [
+                {
+                    labels: ["Lost Items", "Found Items"],
+                    values: [totalLost, totalFound],
+                    type: "pie",
+                    hole: 0.4,
+                    marker: {
+                        colors: ["#ef4444", "#16a34a"]
+                    },
+                    textinfo: "label+value",
+                    hovertemplate:
+                        "%{label}: %{value}<extra></extra>"
+                }
+            ],
+            {
+                ...commonLayout,
+                showlegend: true
+            },
+            config
+        );
+    </script>
+
+</body>
+</html>

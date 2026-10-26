@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Browse Items | FindBack</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #172033;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 20px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            padding: 35px 6%;
+        }
+
+        h2 {
+            color: #172554;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 12px;
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .clear {
+            display: inline-block;
+            margin-top: 14px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 22px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px #0000000c;
+        }
+
+        .item-image,
+        .no-image {
+            width: 100%;
+            height: 210px;
+        }
+
+        .item-image {
+            display: block;
+            object-fit: cover;
+        }
+
+        .no-image {
+            background: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #64748b;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge.found {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .card h3 {
+            color: #172554;
+        }
+
+        .details {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 750px) {
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🔎 FindBack</h1>
+
+        <nav>
+            <a href="{% url 'home' %}">Home</a>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'report_lost' %}">Report Lost</a>
+            <a href="{% url 'report_found' %}">Report Found</a>
+            <a href="{% url 'my_reports' %}">My Reports</a>
+            {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="container">
+
+        <h2>Browse Lost &amp; Found Items</h2>
+
+        <p>Search for belongings by name, category or location.</p>
+
+        <form class="filters" method="GET">
+
+            <div class="filter-row">
+
+                <input type="text" name="q" placeholder="Search item or location" value="{{ search }}">
+
+                <select name="type">
+                    <option value="">All Reports</option>
+                    <option value="LOST">Lost Items</option>
+                    <option value="FOUND">Found Items</option>
+                </select>
+
+                <input type="text" name="category" placeholder="Category" value="{{ category }}">
+
+                <button type="submit">Search</button>
+
+            </div>
+
+            <a class="clear" href="{% url 'browse_items' %}">
+                Clear Filters
+            </a>
+
+        </form>
+
+        <div class="grid">
+
+            {% for item in reports %}
+
+            <article class="card">
+
+                {% if item.image %}
+                <img class="item-image" src="{{ item.image.url }}" alt="{{ item.title }}">
+                {% else %}
+                <div class="no-image">No image available</div>
+                {% endif %}
+
+                <div class="card-content">
+
+                    {% if item.display_type == "LOST ITEM" %}
+                    <span class="badge">LOST ITEM</span>
+                    {% else %}
+                    <span class="badge found">FOUND ITEM</span>
+                    {% endif %}
+
+                    <h3>{{ item.title }}</h3>
+
+                    <div class="details">
+                        <p><strong>Category:</strong> {{ item.category }}</p>
+                        <p><strong>Colour:</strong> {{ item.color }}</p>
+                        <p><strong>Location:</strong> {{ item.location }}</p>
+                        <p><strong>Date:</strong> {{ item.event_date|date:"d M Y" }}</p>
+                        <p>{{ item.description|truncatewords:25 }}</p>
+                    </div>
+
+                </div>
+
+            </article>
+
+            {% empty %}
+
+            <div class="empty-state">
+                <h3>No items found</h3>
+                <p>Try different search terms or clear your filters.</p>
+
+                {% if user.is_authenticated %}
+                <a href="{% url 'report_lost' %}">Report a Lost Item</a>
+                {% else %}
+                <a href="{% url 'login' %}">Login to report an item</a>
+                {% endif %}
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>
